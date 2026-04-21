@@ -1,0 +1,117 @@
+/* ===================================================================
+ * SillyTavern Performance Optimizer - Base Styles
+ * Always active when the extension is enabled.
+ * Safe CSS containment & rendering hints that improve performance
+ * without changing visual appearance.
+ * =================================================================== */
+
+/* -------------------------------------------------------------------
+ * Chat Virtualizer v2 - CSS-driven dehydration
+ * Dehydrated messages have `data-perf-dehydrated` attribute set.
+ * This rule hides all children without JS iteration, making
+ * bulk dehydration/hydration O(1) per message.
+ * ------------------------------------------------------------------- */
+.mes[data-perf-dehydrated] > * {
+    display: none !important;
+}
+
+/* -------------------------------------------------------------------
+ * Message Virtualization
+ * content-visibility for .mes is now managed dynamically by
+ * ChatVirtualizer (when active) to prevent scroll position issues.
+ * When virtualizer is disabled, messages render normally.
+ * See chat-virtualizer.js _injectHydratedOverride().
+ * ------------------------------------------------------------------- */
+
+/* -------------------------------------------------------------------
+ * CSS Containment
+ * Isolate layout recalculations to specific subtrees.
+ * ------------------------------------------------------------------- */
+#chat {
+    contain: style;
+}
+
+.completion_prompt_manager_list {
+    contain: layout style;
+}
+
+/* -------------------------------------------------------------------
+ * Scroll Behavior
+ * Prevent scroll chaining between nested containers.
+ * ------------------------------------------------------------------- */
+#chat,
+.completion_prompt_manager_list,
+#sheld,
+.drawer-content,
+.popup-content {
+    overscroll-behavior: contain;
+}
+
+/* ===================================================================
+ * Extension Settings Panel Styles
+ * =================================================================== */
+.perf-opt-panel {
+    padding: 5px 0;
+}
+
+.perf-opt-section {
+    margin: 6px 0;
+    padding: 5px 10px;
+    border-left: 2px solid var(--SmartThemeQuoteColor, #888);
+}
+
+.perf-opt-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 3px 0;
+    gap: 8px;
+}
+
+.perf-opt-toggle label {
+    flex: 1;
+    cursor: pointer;
+    font-size: 0.95em;
+}
+
+.perf-opt-status {
+    font-size: 0.85em;
+    padding: 5px 0;
+    color: var(--SmartThemeQuoteColor, #888);
+}
+
+.perf-opt-subtitle {
+    font-size: 0.82em;
+    color: var(--SmartThemeQuoteColor, #888);
+    margin-bottom: 3px;
+}
+
+.perf-opt-btn-row {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+    margin-top: 5px;
+}
+
+.perf-opt-section.disabled {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+/* -------------------------------------------------------------------
+ * Mobile Keyboard Transition
+ * Prevent layout thrashing during keyboard open/close.
+ * Active only when body.perf-kb-freeze is set by keyboard optimizer.
+ * ------------------------------------------------------------------- */
+@media screen and (max-width: 1000px) {
+    /* Messages being edited must always be fully visible. */
+    .mes[data-perf-editing="1"] {
+        content-visibility: visible !important;
+        contain: none !important;
+    }
+
+    /* Ensure dehydrated children of editing messages still show. */
+    .mes[data-perf-editing="1"][data-perf-dehydrated] > * {
+        display: initial !important;
+    }
+}
